@@ -1,0 +1,16 @@
+{
+  "name": "autosave-form",
+  "version": "1.0.0",
+  "description": "",
+  "keywords": [],
+  "main": "index.js",
+  "dependencies": {
+    "fast-deep-equal": "2.0.1",
+    "final-form": "1.2.1",
+    "react": "16.8.6",
+    "react-dom": "16.8.6",
+    "react-final-form": "1.2.0",
+    "rxjs": "5.5.3",
+    "styled-components": "2.2.4"
+  }
+}

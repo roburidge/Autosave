@@ -1,0 +1,25 @@
+{
+  "name": "autosave-form",
+  "version": "0.0.48",
+  "description": null,
+  "keywords": [],
+  "main": "index.js",
+  "dependencies": {
+    "fast-deep-equal": "2.0.1",
+    "final-form": "1.2.1",
+    "react": "16.8.6",
+    "react-dom": "16.8.6",
+    "react-final-form": "1.2.0",
+    "rxjs": "5.5.3",
+    "styled-components": "2.2.4"
+  },
+  "devDependencies": {
+    "react-scripts": "1.0.0"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
+  }
+}
