@@ -5,6 +5,9 @@
   "keywords": [],
   "main": "index.js",
   "dependencies": {
+    "@brandwatch/axiom-components": "6.3.1",
+    "@brandwatch/axiom-composites": "0.0.119",
+    "@brandwatch/axiom-materials": "1.17.0",
     "fast-deep-equal": "2.0.1",
     "final-form": "1.2.1",
     "react": "16.8.6",

@@ -1,6 +1,15 @@
 import React from "react";
-
 import { Form, Field, FormSpy } from "react-final-form";
+import {
+  Dropdown,
+  DropdownTarget,
+  TextInput,
+  TextInputIcon,
+  DropdownSource,
+  DropdownContext,
+  DropdownMenu,
+  DropdownMenuItem
+} from "@brandwatch/axiom-components";
 import RenderCount from "./RenderCount";
 import AutoSaveStatus from "./AutoSaveStatus";
 
@@ -11,6 +20,52 @@ const onSubmit = async values => {
   window.alert(JSON.stringify(values, 0, 2));
 };
 const required = value => (value ? undefined : "Required");
+
+function Option({ children }) {
+  return children;
+}
+
+function Select({
+  children,
+  onChange = () => {},
+  timePeriod = "Day",
+  timePeriods = [],
+  label = "Dropdown Test",
+  multiSelect = false
+}) {
+  return (
+    <Dropdown flip="mirror" width="50px">
+      <DropdownTarget>
+        <TextInput
+          label={label}
+          isTarget
+          readOnly
+          inlineLabel
+          value={timePeriod}
+        >
+          <TextInputIcon name="chevron-down" />
+        </TextInput>
+      </DropdownTarget>
+      <DropdownSource>
+        <DropdownContext width="100%">
+          <DropdownMenu>
+            {children.map(time => (
+              <DropdownMenuItem
+                key={time}
+                onClick={() => onChange(time)}
+                selected={timePeriod === time}
+                paddingVertical="small"
+                multiSelect={multiSelect}
+              >
+                {time}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenu>
+        </DropdownContext>
+      </DropdownSource>
+    </Dropdown>
+  );
+}
 
 export default ({ subscription, onChange, initialValues, manualSave }) => (
   <Form
@@ -30,26 +85,11 @@ export default ({ subscription, onChange, initialValues, manualSave }) => (
             </div>
           )}
         </Field>
-        <Field name="firstName" validate={required}>
-          {({ input, meta }) => (
-            <div>
-              <RenderCount />
-              <label>First Name</label>
-              <input {...input} placeholder="First Name" />
-              {meta.touched && meta.error && <span>{meta.error}</span>}
-            </div>
-          )}
-        </Field>
-        <Field name="lastName" validate={required}>
-          {({ input, meta }) => (
-            <div>
-              <RenderCount />
-              <label>Last Name</label>
-              <input {...input} placeholder="Last Name" />
-              {meta.touched && meta.error && <span>{meta.error}</span>}
-            </div>
-          )}
-        </Field>
+
+        <Select id="my-select" label="Deliver every">
+          options.map((o)=><Option>o</Option>)
+        </Select>
+
         <div className="buttons">
           <button type="submit" disabled={submitting}>
             Submit

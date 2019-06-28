@@ -3,7 +3,7 @@ export const loadData = path => async () =>
     setTimeout(
       () =>
         Math.random() > 0
-          ? resolve({ firstName: "phil" })
+          ? resolve({ scheduleName: "Schedule 1" })
           : reject(new Error("No Load")),
       1000
     );
