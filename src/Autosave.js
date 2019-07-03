@@ -27,11 +27,9 @@ export default class AutoSave extends React.Component {
   };
 
   static propTypes = {
-    renderLoading: propTypes.func,
-    renderError: propTypes.func,
-    render: propTypes.func,
+    children: propTypes.func,
     frequency: propTypes.number,
-    onLoad: propTypes.func,
+    // onLoad: propTypes.func,
     onSave: propTypes.func,
     map: propTypes.func
   };
@@ -42,7 +40,6 @@ export default class AutoSave extends React.Component {
 
   state = {
     initialValues: null,
-    status: "LOADING",
     saved: false,
     justSaved: false
   };
@@ -54,7 +51,10 @@ export default class AutoSave extends React.Component {
   saveSuccessSubject = new Subject();
   unmountSubject = new Subject().take(1);
 
-  onChange = value => this.onChangeSubject.next(value);
+  onChange = value => {
+    // console.log("onchange", value);
+    return this.onChangeSubject.next(value);
+  };
   manualSave = value => this.manualSaveSubject.next(value);
   saveNum = 0;
 
@@ -67,18 +67,6 @@ export default class AutoSave extends React.Component {
       unmountSubject,
       saveStatus
     } = this;
-
-    // converting promise to observable allows us to unsubscribe
-    const load$ = Observable.fromPromise(onLoad()).takeUntil(unmountSubject);
-
-    this.loadSubscription = load$.subscribe(
-      initialValues =>
-        this.setState({
-          initialValues,
-          status: "LOADED"
-        }),
-      error => this.setState({ status: "ERROR", error })
-    );
 
     // each save window last till manual save or delay after change
     const nextSave = Observable.merge(
@@ -130,23 +118,14 @@ export default class AutoSave extends React.Component {
   }
 
   render() {
-    const { render, renderLoading, renderError } = this.props;
-    const { initialValues, status, error, saved, lastSaved } = this.state;
+    const { children } = this.props;
+    const { initialValues, saved, lastSaved } = this.state;
     const { onChange, manualSave } = this;
 
-    if (status === "ERROR" && renderError) {
-      return renderError(error);
-    }
-
-    if (status === "LOADING" && renderLoading) {
-      return renderLoading();
-    }
-
-    return render({
+    return children({
       initialValues,
-      status,
-      manualSave,
-      onChange,
+      manualSave, // move into useSave
+      onChange, // move into useSave
       saved,
       lastSaved
     });

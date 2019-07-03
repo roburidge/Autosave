@@ -2,9 +2,9 @@ export const loadData = path => async () =>
   await new Promise((resolve, reject) => {
     setTimeout(
       () =>
-        Math.random() > 0
-          ? resolve({ scheduleName: "Schedule 1" })
-          : reject(new Error("No Load")),
+        Math.random() > 0.2
+          ? resolve({ scheduleName: "Schedule 1", interval: "day" })
+          : reject(new Error("Failed to load data")),
       1000
     );
   });

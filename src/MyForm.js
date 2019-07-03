@@ -1,143 +1,103 @@
-import React from "react";
-import { Form, Field, FormSpy } from "react-final-form";
-import {
-  Dropdown,
-  DropdownTarget,
-  TextInput,
-  TextInputIcon,
-  DropdownSource,
-  DropdownContext,
-  DropdownMenu,
-  DropdownMenuItem
-} from "@brandwatch/axiom-components";
-import RenderCount from "./RenderCount";
+import React, { useState, useEffect } from "react";
+import { TextInput } from "@brandwatch/axiom-components";
+import Select, { Option } from "./Select/Select";
 import AutoSaveStatus from "./AutoSaveStatus";
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-const onSubmit = async values => {
-  await sleep(300);
-  window.alert(JSON.stringify(values, 0, 2));
+const onSubmit = event => {
+  event.preventDefault();
+  return async values => {
+    await sleep(300);
+    window.alert(JSON.stringify(values, 0, 2));
+  };
 };
-const required = value => (value ? undefined : "Required");
 
-function Option({ children }) {
-  return children;
-}
-
-function Select({
-  children,
-  onChange = () => {},
-  timePeriod = "Day",
-  timePeriods = [],
-  label = "Dropdown Test",
-  multiSelect = false
+function MyForm({
+  subscription,
+  onChange,
+  manualSave,
+  initialValues,
+  options = new Map([["day", "Day"], ["week", "Week"], ["month", "Month"]])
 }) {
+  const [scheduleName, setScheduleName] = useState(initialValues.scheduleName);
+  const [interval, setInterval] = useState(initialValues.interval);
+  const { submitting } = subscription;
+
+  const handleScheduleNameChange = event => {
+    setScheduleName(event.target.value);
+  };
+
+  // Similar to componentDidMount and componentDidUpdate:
+  useEffect(() => {
+    // Update the document title using the browser API
+    const values = { scheduleName, interval };
+    onChange(values);
+  });
+
   return (
-    <Dropdown flip="mirror" width="50px">
-      <DropdownTarget>
-        <TextInput
-          label={label}
-          isTarget
-          readOnly
-          inlineLabel
-          value={timePeriod}
+    <form onSubmit={onSubmit}>
+      <TextInput
+        inlineLabel
+        label="Schedule Name"
+        value={scheduleName}
+        name="name"
+        onChange={handleScheduleNameChange}
+      />
+
+      <Select
+        id="my-select"
+        label="Deliver every"
+        selectedValue={options.get(interval)}
+        onChange={setInterval}
+      >
+        {Array.from(options).map(([key, value]) => (
+          <Option value={key} selected={interval === key} key={key}>
+            {value}
+          </Option>
+        ))}
+      </Select>
+
+      <div className="buttons">
+        <button type="submit" disabled={submitting}>
+          Submit
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            console.log("reset");
+          }}
+          disabled={submitting}
         >
-          <TextInputIcon name="chevron-down" />
-        </TextInput>
-      </DropdownTarget>
-      <DropdownSource>
-        <DropdownContext width="100%">
-          <DropdownMenu>
-            {children.map(time => (
-              <DropdownMenuItem
-                key={time}
-                onClick={() => onChange(time)}
-                selected={timePeriod === time}
-                paddingVertical="small"
-                multiSelect={multiSelect}
-              >
-                {time}
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenu>
-        </DropdownContext>
-      </DropdownSource>
-    </Dropdown>
+          Reset
+        </button>
+      </div>
+      <AutoSaveStatus
+        render={({ saved, sinceSave }) => (
+          <div>
+            <span
+              style={{
+                color: "black",
+                fontWeight: "bold",
+                opacity: saved ? 1 : 0.25
+              }}
+            >
+              Saved
+            </span>
+            {` (${sinceSave} sec ago)`}
+          </div>
+        )}
+      />
+      <button type="button" onClick={manualSave}>
+        Force Save
+      </button>
+      <pre>
+        scheduleName: {scheduleName}
+        <br />
+        interval: {interval}
+      </pre>
+    </form>
   );
 }
 
-export default ({ subscription, onChange, initialValues, manualSave }) => (
-  <Form
-    onSubmit={onSubmit}
-    subscription={subscription}
-    initialValues={initialValues}
-    render={({ handleSubmit, reset, submitting, pristine, values }) => (
-      <form onSubmit={handleSubmit}>
-        <RenderCount />
-        <Field name="scheduleName" validate={required}>
-          {({ input, meta }) => (
-            <div>
-              <RenderCount />
-              <label>Schedule Name</label>
-              <input {...input} placeholder="Schedule Name" />
-              {meta.touched && meta.error && <span>{meta.error}</span>}
-            </div>
-          )}
-        </Field>
-
-        <Select id="my-select" label="Deliver every">
-          options.map((o)=><Option>o</Option>)
-        </Select>
-
-        <div className="buttons">
-          <button type="submit" disabled={submitting}>
-            Submit
-          </button>
-          <button
-            type="button"
-            onClick={reset}
-            disabled={submitting || pristine}
-          >
-            Reset
-          </button>
-        </div>
-        <FormSpy
-          subscription={{ values: true }}
-          onChange={({ values }) => onChange(values)}
-        />
-        <AutoSaveStatus
-          render={({ saved, sinceSave }) => (
-            <div>
-              <span
-                style={{
-                  color: "black",
-                  fontWeight: "bold",
-                  opacity: saved ? 1 : 0.25
-                }}
-              >
-                Saved
-              </span>
-              {` (${sinceSave} sec ago)`}
-            </div>
-          )}
-        />
-        <button type="button" onClick={manualSave}>
-          Force Save
-        </button>
-        {values ? (
-          <pre>{JSON.stringify(values, 0, 2)}</pre>
-        ) : (
-          <FormSpy subscription={{ values: true }}>
-            {({ values }) => (
-              <pre>
-                <RenderCount key="count" />
-                {JSON.stringify(values, 0, 2)}
-              </pre>
-            )}
-          </FormSpy>
-        )}
-      </form>
-    )}
-  />
-);
+export default MyForm;
